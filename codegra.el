@@ -447,6 +447,28 @@ This feedback is messaged back to the user."
                                       line))
                                  json))))))
 
+(defun codegrade-view-feedback ()
+  "View all feedback in the current buffer."
+  (interactive)
+  (codegrade--get-json-feedback
+   (lambda (json)
+     (lexical-let ((buf (get-buffer-create "*Feedback*")))
+       (with-current-buffer buf
+	 (erase-buffer)
+	 (insert (format "%s" (string-join (codegrade--format-feedback json))))
+	 (switch-to-buffer-other-window buf))))))
+
+(defun codegrade--format-feedback (feedback)
+  "Formats codegrade `FEEDBACK' into a more readable format."
+  (mapcar #'codegrade--format-record feedback))
+
+(defun codegrade--format-record (record)
+  "Formats codegrade `RECORD' to be printed."
+  (format "--------------------------------------------------------------------------\n%S:%S\n%S\n\n"
+	  (cdr (assoc 'line record))
+	  (cdr (assoc 'col record))
+	  (cdr (assoc 'content record))))
+
 (provide 'codegra)
 
 ;;; codegra.el ends here
